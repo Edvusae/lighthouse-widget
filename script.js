@@ -6,28 +6,30 @@ analyzeBtn.addEventListener('click', async () => {
     if (!url) return alert('Please enter a URL');
 
     toggleLoading(true);
+try {
+    console.log("Fetching data for:", url); // Debug 1
+    const apiEndpoint = `https://www.googleapis.com/pagespeedonline/v5/runPagespeed?url=${encodeURIComponent(url)}&category=ACCESSIBILITY&category=BEST_PRACTICES&category=PERFORMANCE&category=SEO`;
+    
+    const response = await fetch(apiEndpoint);
+    const data = await response.json();
+    
+    console.log("API Response:", data); // Debug 2 - Check if this shows up!
 
-    try {
-        // API Call to PageSpeed Insights (Lighthouse)
-        const apiEndpoint = `https://www.googleapis.com/pagespeedonline/v5/runPagespeed?url=${encodeURIComponent(url)}&category=ACCESSIBILITY&category=BEST_PRACTICES&category=PERFORMANCE&category=SEO`;
-        
-        const response = await fetch(apiEndpoint);
-        const data = await response.json();
-        
-        const scores = {
-            performance: data.lighthouseResult.categories.performance.score * 100,
-            accessibility: data.lighthouseResult.categories.accessibility.score * 100,
-            bestPractices: data.lighthouseResult.categories['best-practices'].score * 100,
-            seo: data.lighthouseResult.categories.seo.score * 100
-        };
-
-        renderChart(scores);
-    } catch (error) {
-        console.error("Error fetching Lighthouse data:", error);
-    } finally {
-        toggleLoading(false);
+    // If the API returns an error, it will be inside data.error
+    if (data.error) {
+        alert(`Error: ${data.error.message}`);
+        return;
     }
-});
+
+    const scores = {
+        performance: data.lighthouseResult.categories.performance.score * 100,
+        accessibility: data.lighthouseResult.categories.accessibility.score * 100,
+        bestPractices: data.lighthouseResult.categories['best-practices'].score * 100,
+        seo: data.lighthouseResult.categories.seo.score * 100
+    };
+
+    renderChart(scores);
+}
 
 function renderChart(scores) {
     const ctx = document.getElementById('scoreChart').getContext('2d');
