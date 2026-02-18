@@ -1,6 +1,25 @@
 const analyzeBtn = document.getElementById('analyzeBtn');
 const urlInput = document.getElementById('urlInput');
 
+// Inside your async function...
+const data = await response.json();
+console.log("Full API Response:", data); // Check your F12 console for this!
+
+if (!data.lighthouseResult) {
+    alert("API Error: " + (data.error ? data.error.message : "Check console"));
+    return;
+}
+
+const categories = data.lighthouseResult.categories;
+const scores = {
+    performance: (categories.performance.score || 0) * 100,
+    accessibility: (categories.accessibility.score || 0) * 100,
+    bestPractices: (categories['best-practices'].score || 0) * 100,
+    seo: (categories.seo.score || 0) * 100
+};
+
+renderChart(scores);
+
 analyzeBtn.addEventListener('click', async () => {
     const url = urlInput.value;
     if (!url) return alert('Please enter a URL');
