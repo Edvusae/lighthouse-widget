@@ -107,3 +107,14 @@ button:hover {
   font-weight: bold;
   margin-top: 1rem;
 }
+
+.charts-container {
+  margin-top: 1rem;
+  padding: 20px;
+  background: rgba(15, 23, 42, 0.5);
+  border-radius: 12px;
+  min-height: 300px; /* Force a height so the chart has room to breathe */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
