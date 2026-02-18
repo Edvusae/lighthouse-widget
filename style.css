@@ -101,3 +101,9 @@ button:hover {
   color: #ff4e42;
   font-weight: 600;
 }
+
+.score {
+  font-size: 2rem;
+  font-weight: bold;
+  margin-top: 1rem;
+}
