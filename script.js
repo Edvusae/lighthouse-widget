@@ -13,7 +13,7 @@ try {
     const response = await fetch(apiEndpoint);
     const data = await response.json();
     
-    console.log("API Response:", data); // Debug 2 - Check if this shows up!
+    console.log("API Response:", data); 
 
     // If the API returns an error, it will be inside data.error
     if (data.error) {
@@ -37,7 +37,7 @@ function renderChart(scores) {
     if(window.myChart) window.myChart.destroy();
 
     window.myChart = new Chart(ctx, {
-        type: 'bar', // or 'doughnut' for that classic look
+        type: 'bar',
         data: {
             labels: ['Performance', 'Accessibility', 'Best Practices', 'SEO'],
             datasets: [{
