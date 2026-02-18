@@ -95,3 +95,9 @@ button:hover {
 .hidden {
   display: none;
 }
+
+.error {
+  margin: 1rem 0;
+  color: #ff4e42;
+  font-weight: 600;
+}
