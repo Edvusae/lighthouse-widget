@@ -66,8 +66,10 @@ analyzeBtn.addEventListener('click', async () => {
         alert(`Failed to analyze site: ${error.message}`);
     }
 } finally {
+    
     toggleLoading(false);
 }
+
 });
 
 // 3. Chart Rendering Logic
