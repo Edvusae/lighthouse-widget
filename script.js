@@ -20,9 +20,10 @@ analyzeBtn.addEventListener('click', async () => {
         console.log("Starting audit for:", url);
         
         // Construct API URL
-        const apiEndpoint = `https://www.googleapis.com/pagespeedonline/v5/runPagespeed?url=${encodeURIComponent(url)}&category=ACCESSIBILITY&category=BEST_PRACTICES&category=PERFORMANCE&category=SEO`;
-        
-        // Fetch data
+    const myKey = "YOUR_API_KEY_HERE";
+    const apiEndpoint = `https://www.googleapis.com/pagespeedonline/v5/runPagespeed?url=${encodeURIComponent(url)}&category=ACCESSIBILITY&category=BEST_PRACTICES&category=PERFORMANCE&category=SEO&key=${myKey}`;
+       
+    // Fetch data
         const response = await fetch(apiEndpoint);
         const data = await response.json();
         
@@ -66,7 +67,7 @@ analyzeBtn.addEventListener('click', async () => {
         alert(`Failed to analyze site: ${error.message}`);
     }
 } finally {
-    
+
     toggleLoading(false);
 }
 
