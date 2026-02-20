@@ -1,76 +1,112 @@
+// 1. Select Elements
 const analyzeBtn = document.getElementById('analyzeBtn');
 const urlInput = document.getElementById('urlInput');
+const loadingIndicator = document.getElementById('loading');
 
-// Inside your async function...
-const data = await response.json();
-console.log("Full API Response:", data); // Check your F12 console for this!
-
-if (!data.lighthouseResult) {
-    alert("API Error: " + (data.error ? data.error.message : "Check console"));
-    return;
-}
-
-const categories = data.lighthouseResult.categories;
-const scores = {
-    performance: (categories.performance.score || 0) * 100,
-    accessibility: (categories.accessibility.score || 0) * 100,
-    bestPractices: (categories['best-practices'].score || 0) * 100,
-    seo: (categories.seo.score || 0) * 100
-};
-
-renderChart(scores);
-
+// 2. Main Event Listener
 analyzeBtn.addEventListener('click', async () => {
-    const url = urlInput.value;
-    if (!url) return alert('Please enter a URL');
-
-    toggleLoading(true);
-try {
-    console.log("Fetching data for:", url); // Debug 1
-    const apiEndpoint = `https://www.googleapis.com/pagespeedonline/v5/runPagespeed?url=${encodeURIComponent(url)}&category=ACCESSIBILITY&category=BEST_PRACTICES&category=PERFORMANCE&category=SEO`;
+    // Basic validation & cleanup
+    const url = urlInput.value.trim();
     
-    const response = await fetch(apiEndpoint);
-    const data = await response.json();
-    
-    console.log("API Response:", data); 
-
-    // If the API returns an error, it will be inside data.error
-    if (data.error) {
-        alert(`Error: ${data.error.message}`);
+    if (!url) {
+        alert('Please enter a URL first!');
         return;
     }
 
-    const scores = {
-        performance: data.lighthouseResult.categories.performance.score * 100,
-        accessibility: data.lighthouseResult.categories.accessibility.score * 100,
-        bestPractices: data.lighthouseResult.categories['best-practices'].score * 100,
-        seo: data.lighthouseResult.categories.seo.score * 100
-    };
+    // Start UI feedback
+    toggleLoading(true);
 
-    renderChart(scores);
-}
+    try {
+        console.log("Starting audit for:", url);
+        
+        // Construct API URL
+        const apiEndpoint = `https://www.googleapis.com/pagespeedonline/v5/runPagespeed?url=${encodeURIComponent(url)}&category=ACCESSIBILITY&category=BEST_PRACTICES&category=PERFORMANCE&category=SEO`;
+        
+        // Fetch data
+        const response = await fetch(apiEndpoint);
+        const data = await response.json();
+        
+        console.log("API Data received:", data);
 
+        // Error Handling for API response
+        if (data.error) {
+            throw new Error(data.error.message);
+        }
+
+        if (!data.lighthouseResult) {
+            throw new Error("Lighthouse results not found in response.");
+        }
+
+        // Extract and Scale Scores
+        const categories = data.lighthouseResult.categories;
+        const scores = {
+            performance: (categories.performance.score || 0) * 100,
+            accessibility: (categories.accessibility.score || 0) * 100,
+            bestPractices: (categories['best-practices'].score || 0) * 100,
+            seo: (categories.seo.score || 0) * 100
+        };
+
+        // Render the UI
+        renderChart(scores);
+
+    } catch (error) {
+        console.error("Audit Failed:", error);
+        alert(`Failed to analyze site: ${error.message}`);
+    } finally {
+        // Always turn off loading, even if it failed
+        toggleLoading(false);
+    }
+});
+
+// 3. Chart Rendering Logic
 function renderChart(scores) {
     const ctx = document.getElementById('scoreChart').getContext('2d');
- 
-    if(window.myChart) window.myChart.destroy();
+
+    // Destroy existing chart to prevent hover flickering/ghosting
+    if (window.myChart instanceof Chart) {
+        window.myChart.destroy();
+    }
 
     window.myChart = new Chart(ctx, {
         type: 'bar',
         data: {
             labels: ['Performance', 'Accessibility', 'Best Practices', 'SEO'],
             datasets: [{
-                label: 'Lighthouse Score',
+                label: 'Score (0-100)',
                 data: [scores.performance, scores.accessibility, scores.bestPractices, scores.seo],
-                backgroundColor: ['#ff4e42', '#ffa400', '#00c345', '#00b0ff']
+                backgroundColor: [
+                    '#ff4e42', // Red
+                    '#ffa400', // Orange
+                    '#00c345', // Green
+                    '#00b0ff'  // Blue
+                ],
+                borderRadius: 8
             }]
         },
         options: {
-            scales: { y: { beginAtZero: true, max: 100 } }
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    max: 100,
+                    grid: { color: '#334155' },
+                    ticks: { color: '#94a3b8' }
+                },
+                x: {
+                    ticks: { color: '#94a3b8' }
+                }
+            },
+            plugins: {
+                legend: { display: false }
+            }
         }
     });
 }
 
+// 4. UI Helpers
 function toggleLoading(show) {
-    document.getElementById('loading').classList.toggle('hidden', !show);
+    loadingIndicator.classList.toggle('hidden', !show);
+    analyzeBtn.disabled = show;
+    analyzeBtn.textContent = show ? 'Analyzing...' : 'Analyze';
 }
