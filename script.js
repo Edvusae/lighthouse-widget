@@ -5,6 +5,7 @@ const loadingIndicator = document.getElementById('loading');
 
 // 2. Main Event Listener
 analyzeBtn.addEventListener('click', async () => {
+
     // Basic validation & cleanup
     const url = urlInput.value.trim();
     
@@ -20,8 +21,8 @@ analyzeBtn.addEventListener('click', async () => {
         console.log("Starting audit for:", url);
         
         // Construct API URL
-    const myKey = "YOUR_API_KEY_HERE";
-    const apiEndpoint = `https://www.googleapis.com/pagespeedonline/v5/runPagespeed?url=${encodeURIComponent(url)}&category=ACCESSIBILITY&category=BEST_PRACTICES&category=PERFORMANCE&category=SEO&key=${myKey}`;
+        const myKey = "YOUR_API_KEY_HERE";
+        const apiEndpoint = `https://www.googleapis.com/pagespeedonline/v5/runPagespeed?url=${encodeURIComponent(url)}&category=ACCESSIBILITY&category=BEST_PRACTICES&category=PERFORMANCE&category=SEO&key=${myKey}`;
        
     // Fetch data
         const response = await fetch(apiEndpoint);
@@ -42,8 +43,11 @@ analyzeBtn.addEventListener('click', async () => {
         const categories = data.lighthouseResult.categories;
         const scores = {
             performance: (categories.performance.score || 0) * 100,
+            
             accessibility: (categories.accessibility.score || 0) * 100,
+            
             bestPractices: (categories['best-practices'].score || 0) * 100,
+            
             seo: (categories.seo.score || 0) * 100
         };
 
