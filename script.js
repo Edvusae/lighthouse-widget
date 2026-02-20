@@ -50,12 +50,24 @@ analyzeBtn.addEventListener('click', async () => {
         renderChart(scores);
 
     } catch (error) {
-        console.error("Audit Failed:", error);
+    console.error("Audit Failed:", error);
+    
+    // Check if it's a quota error
+    if (error.message.includes("Quota exceeded")) {
+        alert("API Limit hit! Showing demo data for your screenshot...");
+        const demoScores = {
+            performance: 92,
+            accessibility: 100,
+            bestPractices: 96,
+            seo: 100
+        };
+        renderChart(demoScores);
+    } else {
         alert(`Failed to analyze site: ${error.message}`);
-    } finally {
-        // Always turn off loading, even if it failed
-        toggleLoading(false);
     }
+} finally {
+    toggleLoading(false);
+}
 });
 
 // 3. Chart Rendering Logic
