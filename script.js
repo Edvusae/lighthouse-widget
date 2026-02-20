@@ -52,7 +52,7 @@ try {
 
 function renderChart(scores) {
     const ctx = document.getElementById('scoreChart').getContext('2d');
-    // Clear previous chart if it exists
+ 
     if(window.myChart) window.myChart.destroy();
 
     window.myChart = new Chart(ctx, {
