@@ -3,25 +3,39 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lighthouse Score Widget</title>
+    <title>Lighthouse Portfolio Widget</title>
     <link rel="stylesheet" href="style.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="script.js" defer></script>
 </head>
 <body>
     <main class="container">
-        <h1>Lighthouse Auditor</h1>
-        <div class="input-group">
-            <input type="text" id="urlInput" placeholder="https://example.com">
-            <button id="analyzeBtn">Analyze</button>
-        </div>
+        <header>
+            <h1>Lighthouse Auditor</h1>
+            <p>Enter a URL to check performance, SEO, and more.</p>
+        </header>
+
+        <section class="input-section">
+            <div class="input-group">
+                <input type="text" id="urlInput" placeholder="https://www.google.com" autocomplete="off">
+                <button id="analyzeBtn">Analyze Site</button>
+            </div>
+            <div id="loading" class="hidden">
+                <div class="spinner"></div>
+                <span>Running Audit...</span>
+            </div>
+        </section>
+
+        <section id="resultsSection" class="hidden">
+            <div class="score-grid" id="scoreGrid">
+                </div>
+            <div class="charts-container">
+                <canvas id="scoreChart"></canvas>
+            </div>
+            <button id="copyBtn" class="secondary-btn">Copy Report Markdown</button>
+        </section>
         
-        <div id="loading" class="hidden">Analyzing... this takes a few seconds.</div>
-        
-        <div class="charts-container">
-            <canvas id="scoreChart"></canvas>
-        </div>
     </main>
+
     <script src="script.js"></script>
 </body>
 </html>
