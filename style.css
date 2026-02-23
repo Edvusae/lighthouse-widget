@@ -1,120 +1,96 @@
 :root {
-  --bg-color: #0f172a;
-  --card-bg: #1e293b;
-  --text-main: #f8fafc;
-  --text-dim: #94a3b8;
-  --accent: #38bdf8;
-  
-  /* Lighthouse Score Colors */
-  --score-green: #00cc66;
-  --score-orange: #ffa400;
-  --score-red: #ff4e42;
-}
-
-* {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-  font-family: 'Inter', system-ui, sans-serif;
+    --bg: #0f172a;
+    --card: #1e293b;
+    --accent: #38bdf8;
+    --text: #f8fafc;
+    --text-dim: #94a3b8;
+    /* Lighthouse Colors */
+    --fail: #ff4e42;
+    --average: #ffa400;
+    --pass: #00c345;
 }
 
 body {
-  background-color: var(--bg-color);
-  color: var(--text-main);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  min-height: 100vh;
+    background-color: var(--bg);
+    color: var(--text);
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    display: flex;
+    justify-content: center;
+    padding: 40px 20px;
 }
 
 .container {
-  background: var(--card-bg);
-  padding: 2rem;
-  border-radius: 16px;
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
-  width: 90%;
-  max-width: 600px;
-  text-align: center;
+    width: 100%;
+    max-width: 800px;
+    background: var(--card);
+    padding: 2rem;
+    border-radius: 20px;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.5);
 }
 
-h1 {
-  margin-bottom: 1.5rem;
-  font-size: 1.5rem;
-  letter-spacing: -0.5px;
-}
+header { text-align: center; margin-bottom: 2rem; }
+header p { color: var(--text-dim); margin-top: 0.5rem; }
 
 .input-group {
-  display: flex;
-  gap: 10px;
-  margin-bottom: 2rem;
+    display: flex;
+    gap: 12px;
+    margin-bottom: 1rem;
 }
 
 input {
-  flex: 1;
-  padding: 12px 16px;
-  border-radius: 8px;
-  border: 1px solid #334155;
-  background: #0f172a;
-  color: white;
-  outline: none;
-}
-
-input:focus {
-  border-color: var(--accent);
+    flex: 1;
+    padding: 14px;
+    border-radius: 10px;
+    border: 1px solid #334155;
+    background: #0f172a;
+    color: white;
+    font-size: 1rem;
 }
 
 button {
-  padding: 12px 24px;
-  background: var(--accent);
-  border: none;
-  border-radius: 8px;
-  color: #0f172a;
-  font-weight: 600;
-  cursor: pointer;
-  transition: transform 0.2s;
+    padding: 14px 28px;
+    background: var(--accent);
+    color: #0f172a;
+    border: none;
+    border-radius: 10px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: 0.3s;
 }
 
-button:hover {
-  transform: translateY(-2px);
-  filter: brightness(1.1);
+button:hover { transform: translateY(-2px); filter: brightness(1.2); }
+
+/* Score Cards */
+.score-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 15px;
+    margin: 2rem 0;
 }
 
-.charts-container {
-  margin-top: 1rem;
-  padding: 20px;
-  background: rgba(15, 23, 42, 0.5);
-  border-radius: 12px;
+.score-card {
+    background: #0f172a;
+    padding: 1.5rem;
+    border-radius: 12px;
+    text-align: center;
+    border-bottom: 4px solid transparent;
 }
 
-#loading {
-  margin: 1rem 0;
-  color: var(--accent);
-  font-style: italic;
+.score-card h3 { font-size: 0.8rem; color: var(--text-dim); text-transform: uppercase; }
+.score-card .value { font-size: 2rem; font-weight: bold; margin-top: 5px; }
+
+.charts-container { height: 300px; margin-top: 2rem; }
+
+.hidden { display: none; }
+
+.spinner {
+    width: 20px; height: 20px;
+    border: 3px solid rgba(255,255,255,0.1);
+    border-top-color: var(--accent);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    display: inline-block;
+    vertical-align: middle;
 }
 
-.hidden {
-  display: none;
-}
-
-.error {
-  margin: 1rem 0;
-  color: #ff4e42;
-  font-weight: 600;
-}
-
-.score {
-  font-size: 2rem;
-  font-weight: bold;
-  margin-top: 1rem;
-}
-
-.charts-container {
-  margin-top: 1rem;
-  padding: 20px;
-  background: rgba(15, 23, 42, 0.5);
-  border-radius: 12px;
-  min-height: 300px; /* Force a height so the chart has room to breathe */
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
+@keyframes spin { to { transform: rotate(360deg); } }
