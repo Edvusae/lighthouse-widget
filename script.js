@@ -1,131 +1,124 @@
-// 1. Select Elements
+const CONFIG = {
+    // Pro-tip: Get your free key at https://developers.google.com/speed/docs/insights/v5/get-started
+    API_KEY: "YOUR_API_KEY_HERE", 
+    CATEGORIES: ['performance', 'accessibility', 'best-practices', 'seo']
+};
+
+const state = {
+    scores: null,
+    currentUrl: ""
+};
+
+// Selectors
 const analyzeBtn = document.getElementById('analyzeBtn');
 const urlInput = document.getElementById('urlInput');
-const loadingIndicator = document.getElementById('loading');
+const loading = document.getElementById('loading');
+const resultsSection = document.getElementById('resultsSection');
 
-// 2. Main Event Listener
 analyzeBtn.addEventListener('click', async () => {
-
-    // Basic validation & cleanup
     const url = urlInput.value.trim();
-    
-    if (!url) {
-        alert('Please enter a URL first!');
-        return;
-    }
+    if (!url) return;
 
-    // Start UI feedback
-    toggleLoading(true);
+    toggleUI(true);
 
     try {
-        console.log("Starting audit for:", url);
+        const endpoint = `https://www.googleapis.com/pagespeedonline/v5/runPagespeed?url=${encodeURIComponent(url)}&${CONFIG.CATEGORIES.map(c => `category=${c.toUpperCase()}`).join('&')}&key=${CONFIG.API_KEY}`;
         
-        // Construct API URL
-        const myKey = "YOUR_API_KEY_HERE";
-        const apiEndpoint = `https://www.googleapis.com/pagespeedonline/v5/runPagespeed?url=${encodeURIComponent(url)}&category=ACCESSIBILITY&category=BEST_PRACTICES&category=PERFORMANCE&category=SEO&key=${myKey}`;
-       
-    // Fetch data
-        const response = await fetch(apiEndpoint);
+        const response = await fetch(endpoint);
         const data = await response.json();
-        
-        console.log("API Data received:", data);
 
-        // Error Handling for API response
-        if (data.error) {
-            throw new Error(data.error.message);
-        }
+        if (data.error) throw new Error(data.error.message);
 
-        if (!data.lighthouseResult) {
-            throw new Error("Lighthouse results not found in response.");
-        }
-
-        // Extract and Scale Scores
-        const categories = data.lighthouseResult.categories;
-        const scores = {
-            performance: (categories.performance.score || 0) * 100,
-            
-            accessibility: (categories.accessibility.score || 0) * 100,
-            
-            bestPractices: (categories['best-practices'].score || 0) * 100,
-            
-            seo: (categories.seo.score || 0) * 100
-        };
-
-        // Render the UI
-        renderChart(scores);
-
-    } catch (error) {
-    console.error("Audit Failed:", error);
-    
-    // Check if it's a quota error
-    if (error.message.includes("Quota exceeded")) {
-        alert("API Limit hit! Showing demo data for your screenshot...");
-        const demoScores = {
-            performance: 92,
-            accessibility: 100,
-            bestPractices: 96,
-            seo: 100
-        };
-        renderChart(demoScores);
-    } else {
-        alert(`Failed to analyze site: ${error.message}`);
+        processResults(data.lighthouseResult.categories, url);
+    } catch (err) {
+        handleError(err);
+    } finally {
+        toggleUI(false);
     }
-} finally {
-
-    toggleLoading(false);
-}
-
 });
 
-// 3. Chart Rendering Logic
-function renderChart(scores) {
+function processResults(categories, url) {
+    state.currentUrl = url;
+    state.scores = {
+        Performance: categories.performance.score * 100,
+        Accessibility: categories.accessibility.score * 100,
+        "Best Practices": categories['best-practices'].score * 100,
+        SEO: categories.seo.score * 100
+    };
+
+    renderUI();
+}
+
+function getStatusColor(score) {
+    if (score >= 90) return '#00c345'; // Pass
+    if (score >= 50) return '#ffa400'; // Average
+    return '#ff4e42'; // Fail
+}
+
+function renderUI() {
+    resultsSection.classList.remove('hidden');
+    const grid = document.getElementById('scoreGrid');
+    grid.innerHTML = '';
+
+    Object.entries(state.scores).forEach(([label, value]) => {
+        const color = getStatusColor(value);
+        grid.innerHTML += `
+            <div class="score-card" style="border-color: ${color}">
+                <h3>${label}</h3>
+                <div class="value" style="color: ${color}">${Math.round(value)}</div>
+            </div>
+        `;
+    });
+
+    renderChart();
+}
+
+function renderChart() {
     const ctx = document.getElementById('scoreChart').getContext('2d');
+    if (window.myChart) window.myChart.destroy();
 
-    // Destroy existing chart to prevent hover flickering/ghosting
-    if (window.myChart instanceof Chart) {
-        window.myChart.destroy();
-    }
-
+    const dataValues = Object.values(state.scores);
+    
     window.myChart = new Chart(ctx, {
         type: 'bar',
         data: {
-            labels: ['Performance', 'Accessibility', 'Best Practices', 'SEO'],
+            labels: Object.keys(state.scores),
             datasets: [{
-                label: 'Score (0-100)',
-                data: [scores.performance, scores.accessibility, scores.bestPractices, scores.seo],
-                backgroundColor: [
-                    '#ff4e42', // Red
-                    '#ffa400', // Orange
-                    '#00c345', // Green
-                    '#00b0ff'  // Blue
-                ],
+                data: dataValues,
+                backgroundColor: dataValues.map(v => getStatusColor(v)),
                 borderRadius: 8
             }]
         },
         options: {
             responsive: true,
             maintainAspectRatio: false,
+            plugins: { legend: { display: false } },
             scales: {
-                y: {
-                    beginAtZero: true,
-                    max: 100,
-                    grid: { color: '#334155' },
-                    ticks: { color: '#94a3b8' }
-                },
-                x: {
-                    ticks: { color: '#94a3b8' }
-                }
-            },
-            plugins: {
-                legend: { display: false }
+                y: { beginAtZero: true, max: 100, ticks: { color: '#94a3b8' } },
+                x: { ticks: { color: '#94a3b8' } }
             }
         }
     });
 }
 
-// 4. UI Helpers
-function toggleLoading(show) {
-    loadingIndicator.classList.toggle('hidden', !show);
-    analyzeBtn.disabled = show;
-    analyzeBtn.textContent = show ? 'Analyzing...' : 'Analyze';
+function toggleUI(isLoading) {
+    loading.classList.toggle('hidden', !isLoading);
+    analyzeBtn.disabled = isLoading;
+    if (isLoading) resultsSection.classList.add('hidden');
+}
+
+function handleError(err) {
+    console.error(err);
+    // If quota hit, show mock data so user can still take a screenshot
+    if (err.message.includes("Quota")) {
+        alert("Quota exceeded! Displaying demo data for screenshot.");
+        processResults({
+            performance: {score: 0.92},
+            accessibility: {score: 1.0},
+            'best-practices': {score: 0.96},
+            seo: {score: 0.98}
+        }, "demo-mode");
+    } else {
+        alert("Error: " + err.message);
+    }
 }
