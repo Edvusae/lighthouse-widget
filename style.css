@@ -32,7 +32,11 @@ header {
     text-align: center; 
     margin-bottom: 2rem; 
 }
-header p { color: var(--text-dim); margin-top: 0.5rem; }
+header p { 
+    color: 
+    var(--text-dim); 
+    margin-top: 0.5rem;
+    font-size: 0.9rem;}
 
 .input-group {
     display: flex;
