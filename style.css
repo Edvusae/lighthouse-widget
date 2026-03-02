@@ -28,7 +28,10 @@ body {
     box-shadow: 0 20px 50px rgba(0,0,0,0.5);
 }
 
-header { text-align: center; margin-bottom: 2rem; }
+header { 
+    text-align: center; 
+    margin-bottom: 2rem; 
+}
 header p { color: var(--text-dim); margin-top: 0.5rem; }
 
 .input-group {
