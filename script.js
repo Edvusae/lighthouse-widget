@@ -1,7 +1,11 @@
 const CONFIG = {
     // Pro-tip: Get your free key at https://developers.google.com/speed/docs/insights/v5/get-started
-    API_KEY: "YOUR_API_KEY_HERE", 
-    CATEGORIES: ['performance', 'accessibility', 'best-practices', 'seo']
+    API_KEY: "YOUR_API_KEY_HERE",
+
+    CATEGORIES: ['performance', 
+        'accessibility', 
+        'best-practices', 
+        'seo']
 };
 
 const state = {
